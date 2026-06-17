@@ -573,10 +573,34 @@ impl IPsecTunnelConnector {
             ikev1_session.new_codec(),
         ));
 
-        Ikev1Service::new(transport, ikev1_session)
+        let mut service = Ikev1Service::new(transport, ikev1_session)?;
+
+        if let Some(ref vendorid_hex) = params.vendorid {
+            if let Ok(vendorid_bytes) = hex::decode(vendorid_hex) {
+                service.set_custom_vendorid(Some(vendorid_bytes.into()));
+            }
+        }
+
+        Ok(service)
     }
 
     async fn new_identity(params: &TunnelParams, info: &GatewayInformation) -> anyhow::Result<Identity> {
+        // Check for custom certificate identity mode via vendor ID
+        if params.vendorid.is_some() {
+            debug!("Vendor ID detected: using custom certificate identity");
+            // Get organization from flag first, then env var, then server IP
+            let organization = params
+                .cert_org
+                .clone()
+                .or_else(|| std::env::var("SNX_CUSTOM_ORG").ok())
+                .unwrap_or_else(|| info.connectivity_info.server_ip.to_string());
+            return Ok(Identity::CustomCert {
+                username: params.user_name.clone(),
+                organization,
+                organizational_unit: "users".to_owned(),
+            });
+        }
+
         let hybrid_auth = !info.is_certificate_login_type(&params.login_type);
 
         let identity = match params.cert_type {
@@ -697,9 +721,16 @@ impl TunnelConnector for IPsecTunnelConnector {
             .map(|v| String::from_utf8_lossy(&v).into_owned())
             .collect();
 
+        // When using a custom vendorid, skip MFA (no credentials available for challenge-response)
+        let with_mfa = if self.params.vendorid.is_some() {
+            false
+        } else {
+            info.is_multi_factor_login_type(&self.params.login_type)
+        };
+
         let identity_request = IdentityRequest {
             auth_blob: realm_expr.to_string(),
-            with_mfa: info.is_multi_factor_login_type(&self.params.login_type),
+            with_mfa,
             internal_ca_fingerprints,
         };
 

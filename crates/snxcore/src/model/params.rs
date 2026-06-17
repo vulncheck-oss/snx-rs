@@ -477,6 +477,10 @@ pub struct TunnelParams {
     pub mfa_code: Option<String>,
     #[serde(skip)]
     pub reg_key: Option<String>,
+    #[serde(skip)]
+    pub vendorid: Option<String>,
+    #[serde(skip)]
+    pub cert_org: Option<String>,
     pub client_logging_data: Option<PathBuf>,
     #[serde(skip)]
     pub config_file: PathBuf,
@@ -530,6 +534,8 @@ impl Default for TunnelParams {
             tls_version_max: TlsVersion::default(),
             mfa_code: None,
             reg_key: None,
+            vendorid: None,
+            cert_org: None,
             client_logging_data: None,
             config_file: Self::default_config_path(),
         }

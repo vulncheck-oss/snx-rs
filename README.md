@@ -1,3 +1,15 @@
+# To Install from Source on a Debian-Based Distro
+
+```
+# Used kali-rolling
+# First, install rust (hit enter a few times to install defaults)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh 
+
+# Then restart your shell to pull the new cargo .env file in and then run
+apt update
+apt install -y libssl-dev pkg-config libsqlite3-dev
+```
+
 # Open Source Client for Check Point VPN Tunnels
 
 [![github actions](https://github.com/ancwrd1/snx-rs/workflows/CI/badge.svg)](https://github.com/ancwrd1/snx-rs/actions)

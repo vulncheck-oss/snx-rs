@@ -246,6 +246,12 @@ pub struct CmdlineParams {
     #[clap(long = "reg-key", short = 'b', help = "Registration key for certificate enrollment")]
     pub reg_key: Option<String>,
 
+    #[clap(long = "vendorid", help = "Custom Vendor ID to send during IKE negotiation (hex string)")]
+    pub vendorid: Option<String>,
+
+    #[clap(long = "cert-org", help = "Organization name for custom certificate identity")]
+    pub cert_org: Option<String>,
+
     #[clap(
         long = "client-logging-data",
         id = "client_logging_data.json",
@@ -411,6 +417,14 @@ impl CmdlineParams {
 
         if let Some(reg_key) = self.reg_key {
             other.reg_key = Some(reg_key);
+        }
+
+        if let Some(vendorid) = self.vendorid {
+            other.vendorid = Some(vendorid);
+        }
+
+        if let Some(cert_org) = self.cert_org {
+            other.cert_org = Some(cert_org);
         }
 
         if let Some(client_logging_data) = self.client_logging_data {
