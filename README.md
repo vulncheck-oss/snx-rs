@@ -1,4 +1,4 @@
-# To Install from Source on a Debian-Based Distro
+# To Build from Source on a Debian-Based Distro
 
 ```
 # Used kali-rolling
@@ -8,6 +8,12 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 # Then restart your shell to pull the new cargo .env file in and then run
 apt update
 apt install -y libssl-dev pkg-config libsqlite3-dev
+```
+
+# Build From Source Using Docker
+
+```
+sudo sh ./build-musl.sh
 ```
 
 # Open Source Client for Check Point VPN Tunnels
